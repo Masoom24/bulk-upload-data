@@ -20,23 +20,20 @@ router.post("/", upload.single("file"), async (req, res) => {
       return res.status(400).json({ error: "No file uploaded" });
     }
 
-    // Immediately respond that upload was successful
-    res.status(200).json({
-      message: "File uploaded successfully",
-      filename: req.file.filename,
-      path: req.file.path,
-    });
+    // Respond to client once
     res.status(200).json({
       message: "File uploaded successfully",
       filename: req.file.filename,
       path: req.file.path,
     });
 
-    // Then process the file in background
+    // Run job in background
     await jobQueue.add({ filePath: req.file.path });
   } catch (err) {
     console.error("Upload error:", err);
-    res.status(500).json({ error: "Processing failed" });
+    if (!res.headersSent) {
+      return res.status(500).json({ error: "Processing failed" });
+    }
   }
 });
 

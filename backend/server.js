@@ -16,6 +16,8 @@ require("./sockets/socketHandler")(io);
 app.use(cors());
 app.use("/uploads", express.static("uploads"));
 app.use("/api/upload", require("./routes/uploadRoute"));
-
+app.get("/", (req, res) => {
+  res.send(" Bulk Upload Server is Running!");
+});
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
