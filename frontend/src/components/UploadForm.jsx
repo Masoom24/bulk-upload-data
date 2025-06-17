@@ -5,7 +5,8 @@ import socket from "../socket";
 const UploadForm = () => {
   const [file, setFile] = useState(null);
   const [progress, setProgress] = useState(0);
-  const [showMessage, setShowMessage] = useState(false); // 🟡 for popup message
+  const [showMessage, setShowMessage] = useState(false); //  for popup message
+  const [abortController, setAbortController] = useState(null);
 
   useEffect(() => {
     socket.on("progress", (data) => {
@@ -32,11 +33,23 @@ const UploadForm = () => {
     const formData = new FormData();
     formData.append("file", file);
 
+    //save it for cancelling the upload
+    const controller = new AbortController();
+    setAbortController(controller);
+
     try {
-      await axios.post("http://localhost:5000/api/upload", formData);
+      await axios.post("http://localhost:5000/api/upload", formData, {
+        signal: controller.signal,
+      });
       console.log("data", formData);
     } catch (error) {
-      alert("Upload failed!");
+      if (axios.isCancel(error)) {
+        alert("Upload failed!");
+      } else if (error.name === "CanceledError") {
+        alert("Upload cancelled.");
+      } else {
+        alert("Upload failed!");
+      }
       console.error(error);
     }
   };
@@ -59,12 +72,17 @@ const UploadForm = () => {
         hover:file:bg-blue-700
         mb-4 cursor-pointer"
       />
-      <button
-        onClick={handleUpload}
-        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition duration-300"
-      >
-        Upload
-      </button>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-4">
+        <button
+          onClick={handleUpload}
+          disabled={abortController !== null}
+          className={`flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition duration-300
+      ${abortController ? "opacity-50 cursor-not-allowed" : ""}`}
+        >
+          Upload
+        </button>
+      </div>
+
       <div className="mt-6">
         <p className="text-sm font-medium text-gray-700 mb-2">Progress:</p>
         <div className="w-full bg-gray-200 rounded-full h-4">
