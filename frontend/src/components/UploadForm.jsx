@@ -41,9 +41,7 @@ const UploadForm = () => {
       await axios.post(
         "https://bulk-upload-data-1.onrender.com/api/upload",
         formData,
-        {
-          signal: controller.signal,
-        }
+        { signal: controller.signal }
       );
       console.log("data", formData);
     } catch (error) {

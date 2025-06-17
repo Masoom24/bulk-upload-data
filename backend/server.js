@@ -10,26 +10,25 @@ const io = socketIo(server, {
   cors: {
     origin: [
       "http://localhost:3000",
-      "https://bulk-upload-data-4zxc.vercel.app", // ✅ Your frontend URL
+      "https://bulk-upload-data-4zxc.vercel.app",
     ],
     methods: ["GET", "POST"],
     credentials: true,
   },
 });
-
-require("./config/db");
-require("./sockets/socketHandler")(io);
-
 app.use(
   cors({
     origin: [
       "http://localhost:3000",
-      "https://bulk-upload-data-4zxc.vercel.app", // ✅ Your frontend URL
+      "https://bulk-upload-data-4zxc.vercel.app",
     ],
     methods: ["GET", "POST"],
     credentials: true,
   })
 );
+
+require("./config/db");
+require("./sockets/socketHandler")(io);
 app.use("/uploads", express.static("uploads"));
 app.use("/api/upload", require("./routes/uploadRoute"));
 app.get("/", (req, res) => {
