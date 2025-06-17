@@ -38,9 +38,13 @@ const UploadForm = () => {
     setAbortController(controller);
 
     try {
-      await axios.post("http://localhost:5000/api/upload", formData, {
-        signal: controller.signal,
-      });
+      await axios.post(
+        "https://bulk-upload-data-1.onrender.com/api/upload",
+        formData,
+        {
+          signal: controller.signal,
+        }
+      );
       console.log("data", formData);
     } catch (error) {
       if (axios.isCancel(error)) {

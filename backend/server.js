@@ -7,13 +7,29 @@ require("dotenv").config();
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
-  cors: { origin: "*" },
+  cors: {
+    origin: [
+      "http://localhost:3000",
+      "https://bulk-upload-data-4zxc.vercel.app", // ✅ Your frontend URL
+    ],
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
 });
 
 require("./config/db");
 require("./sockets/socketHandler")(io);
 
-app.use(cors());
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3000",
+      "https://bulk-upload-data-4zxc.vercel.app", // ✅ Your frontend URL
+    ],
+    methods: ["GET", "POST"],
+    credentials: true,
+  })
+);
 app.use("/uploads", express.static("uploads"));
 app.use("/api/upload", require("./routes/uploadRoute"));
 app.get("/", (req, res) => {
